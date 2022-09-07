@@ -1,3 +1,7 @@
+# VSCode Configuration
+.vscode
+.vscode/*
+
 .*.aux
 .*.d
 *.a

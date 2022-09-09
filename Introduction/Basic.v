@@ -28,6 +28,8 @@ Proof.
     reflexivity.
 Qed.
 
+Module BoolPlayground.
+
 Inductive bool : Type := 
     | true
     | false.
@@ -95,6 +97,59 @@ Compute (andb' true true).
 Example test_andb'1:
     (andb' true false) = false.
 Proof. reflexivity. Qed.
+
+Theorem andb_commutative : forall b c: bool,
+    andb b c = andb c b.
+Proof.
+    intros b c.
+    destruct b eqn:Eb.
+    - destruct c eqn:Ec.
+        -- simpl. reflexivity.
+        -- simpl. reflexivity.
+    - destruct c eqn:Ec.
+        -- simpl. reflexivity.
+        -- simpl. reflexivity.
+    Qed.
+
+Theorem andb_true_elim2 : forall b c : bool,
+    andb b c = true -> c = true.
+Proof.
+    intros b c.
+    destruct b eqn:Eb.
+    - destruct c eqn:Ec.
+        --  simpl.
+            intros H1.
+            reflexivity.
+        --  simpl.
+            intros H2.
+            rewrite -> H2.
+            reflexivity.
+    - destruct c eqn: Ec.
+        --  simpl.
+            intros H3.
+            reflexivity.
+        --  simpl.
+            intros H4.
+            rewrite <- H4.
+            reflexivity.
+    Qed.
+
+Theorem andb_eq_orb : forall b c : bool,
+    (andb b c) = (orb b c) -> b = c.
+Proof.
+    intros b c.
+    destruct b eqn:Eb.
+    - simpl.
+      intros H1.
+      rewrite -> H1.
+      reflexivity.
+    - simpl.
+      intros H2.
+      rewrite <- H2.
+      reflexivity.
+    Qed.
+
+End BoolPlayground.
 
 Module NatPlayground.
 
@@ -263,4 +318,46 @@ Proof.
     rewrite <- mult_n_O.
     simpl.
     reflexivity.
+    Qed.
+
+
+Module NatPlayground4.
+
+Fixpoint eqb (n m: nat) : bool :=
+    match n, m with
+    | O, O => true
+    | S _, O => false
+    | O, S _ => false
+    | S n', S m' => eqb n' m'
+    end.
+
+Check true.
+
+Notation " x ?= y" := (eqb x y) (at level 70) : nat_scope.
+
+Theorem plus_1_neq_0 : forall n : nat,
+    (n + 1) ?= 0 = false.
+Proof.
+    intros n.
+    destruct n as [| n'] eqn:E.
+    - simpl. reflexivity.
+    - simpl. reflexivity.
+    Qed.
+
+End NatPlayground4.
+
+Theorem identity_fn_applied_twice:
+    forall (f: bool -> bool),
+        ((forall x: bool, f x = x) ->
+            (forall b : bool,  f (f b) = b)).
+Proof.
+    intros f.
+    intros H1.
+    destruct b eqn: Eb.
+    -   rewrite -> H1.
+        rewrite -> H1.
+        reflexivity.
+    -   rewrite -> H1.
+        rewrite -> H1.
+        reflexivity.
     Qed.

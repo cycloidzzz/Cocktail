@@ -112,27 +112,24 @@ Proof.
     Qed.
 
 Theorem andb_true_elim2 : forall b c : bool,
-    andb b c = true -> c = true.
+  andb b c = true -> c = true.
 Proof.
-    intros b c.
-    destruct b eqn:Eb.
-    - destruct c eqn:Ec.
-        --  simpl.
-            intros H1.
-            reflexivity.
-        --  simpl.
-            intros H2.
-            rewrite -> H2.
-            reflexivity.
-    - destruct c eqn: Ec.
-        --  simpl.
-            intros H3.
-            reflexivity.
-        --  simpl.
-            intros H4.
-            rewrite <- H4.
-            reflexivity.
-    Qed.
+  intros b c.
+  destruct b eqn:Eb.
+  - simpl.
+    intros H1.
+    rewrite -> H1.
+    reflexivity.
+  - simpl.
+    destruct c eqn:Ec.
+    + simpl.
+      intros H2.
+      reflexivity.
+    + simpl.
+      intros H3.
+      rewrite -> H3.
+      reflexivity.
+  Qed.
 
 Theorem andb_eq_orb : forall b c : bool,
     (andb b c) = (orb b c) -> b = c.

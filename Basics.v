@@ -34,11 +34,22 @@ Inductive bool : Type :=
     | true
     | false.
 
+End BoolPlayground.
+
 Definition negb (a: bool) : bool :=
     match a with
     | true => false
     | false => true
     end.
+
+Theorem negb_involution : forall b : bool,
+  (negb (negb b)) = b.
+Proof.
+  intros b.
+  destruct b eqn:E.
+  - reflexivity.
+  - reflexivity.
+  Qed.
 
 Example test_negb1:
     (negb true) = false.
@@ -146,8 +157,6 @@ Proof.
       reflexivity.
     Qed.
 
-End BoolPlayground.
-
 Module NatPlayground.
 
 Inductive nat: Type :=
@@ -172,17 +181,6 @@ Example test_minus_two:
 Proof. simpl. reflexivity. Qed.
 
 Check S (S (S (S O))) : nat.
-
-Fixpoint even (n : nat) : bool := 
-    match n with
-    | O => true
-    | S O => false
-    | S (S n') => even n'
-    end.
-
-Example test_even1:
-    even (S (S (S (S O)))) = true.
-Proof. simpl. reflexivity. Qed.
 
 Fixpoint plus (a: nat) (b: nat) : nat :=
     match a with
@@ -216,6 +214,13 @@ Example test_3_minus_2:
 Proof. reflexivity. Qed.
 
 End NatPlayground.
+
+Fixpoint even (n : nat) : bool := 
+    match n with
+    | O => true
+    | S O => false
+    | S (S n') => even n'
+    end.
 
 Compute S (S (S (S O))).
 
@@ -318,8 +323,6 @@ Proof.
     Qed.
 
 
-Module NatPlayground4.
-
 Fixpoint eqb (n m: nat) : bool :=
     match n, m with
     | O, O => true
@@ -341,8 +344,6 @@ Proof.
     - simpl. reflexivity.
     Qed.
 
-End NatPlayground4.
-
 Theorem identity_fn_applied_twice:
     forall (f: bool -> bool),
         ((forall x: bool, f x = x) ->
@@ -358,3 +359,88 @@ Proof.
         rewrite -> H1.
         reflexivity.
     Qed.
+
+Theorem negation_fn_applied_twice:
+    forall (f: bool -> bool),
+        ((forall x: bool, f x = negb x) ->
+            (forall b : bool, f (f b) = b)).
+Proof.
+    intros f.
+    intros H1.
+    destruct b eqn:Eb.
+    - rewrite -> H1.
+      rewrite -> H1.
+      simpl.
+      reflexivity.
+    - rewrite -> H1.
+      rewrite -> H1.
+      simpl.
+      reflexivity.
+Qed.
+
+Module BinaryPlayground.
+
+Inductive bin : Type := 
+    | Z
+    | B0 (n : bin)
+    | B1 (n : bin).
+
+Fixpoint increase (n: bin) : bin :=
+    match n with
+    | Z => B1 Z
+    | B0 n' => B1 n'
+    | B1 n' => B0 (increase n')
+    end.
+
+Fixpoint bin_to_nat (n : bin) : nat :=
+    match n with
+    | Z => O
+    | B0 n' => mult 2 (bin_to_nat n')
+    | B1 n' => plus 1 (mult 2 (bin_to_nat n'))
+    end.
+
+Example test_bin_to_nat5:
+    bin_to_nat (B1 (B0 (B1 Z))) = 5.
+Proof. reflexivity. Qed.
+
+Example test_bin_to_nat6:
+    bin_to_nat (B0 (B1 (B1 Z))) = 6.
+Proof. reflexivity. Qed.
+
+Example test_bin_to_nat7:
+    bin_to_nat (B1 (B1 (B1 Z))) = 7.
+Proof. reflexivity. Qed.
+
+Example test_bin_to_nat8:
+    bin_to_nat (B0 (B0 (B0 (B1 Z)))) = 8.
+Proof. reflexivity. Qed.
+
+Example test_bin_to_nat9:
+    bin_to_nat (B1 (B0 (B0 (B1 Z)))) = 9.
+Proof. reflexivity. Qed.
+
+Example test_bin_incr1:
+    increase (B1 Z) = B0 (B1 Z).
+Proof. reflexivity. Qed.
+
+Example test_bin_incr2:
+    increase (B0 (B1 Z)) = (B1 (B1 Z)).
+Proof. reflexivity. Qed.
+
+Example test_bin_incr3:
+    (increase (B1 (B1 Z))) = (B0 (B0 (B1 Z))).
+Proof. reflexivity. Qed.
+
+Example test_bin_incr4:
+    (bin_to_nat (B0 (B1 Z))) = 2.
+Proof. reflexivity. Qed.
+
+Example test_bin_incr5:
+    bin_to_nat (increase (B1 Z)) = 1 + bin_to_nat (B1 Z).
+Proof. reflexivity. Qed.
+
+Example test_bin_incr6:
+    bin_to_nat (increase (increase (B1 Z))) = 2 + bin_to_nat (B1 Z).
+Proof. reflexivity. Qed.
+
+End BinaryPlayground.

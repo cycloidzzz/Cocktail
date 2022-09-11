@@ -1,4 +1,5 @@
 From LF Require Export Basics.
+
 Theorem add_0_r : forall n : nat,
     n + 0 = n.
 Proof.
@@ -139,10 +140,63 @@ Theorem add_shuffle3 : forall n m p : nat,
   n + (m + p) = m + (n + p).
 Proof.
   intros n m p.
-  rewrite <- add_assoc.
-  assert (H1: n + m = m + n).
-    { rewrite -> add_comm. reflexivity. }
+  assert (H1: n + (m + p) = n + m + p).
+    { rewrite -> add_assoc. reflexivity. }
   rewrite -> H1.
+  assert (H2: n + m = m + n).
+    { rewrite -> add_comm. reflexivity. }
+  rewrite -> H2.
   rewrite -> add_assoc.
   reflexivity.
   Qed.
+
+Theorem mult_n_Sm : forall n m : nat,
+  n * S m = n + n * m.
+Proof.
+  intros n m.
+  induction n as [| n' IHn'].
+  - reflexivity.
+  - simpl.
+    rewrite -> IHn'.
+    rewrite -> add_shuffle3.
+    reflexivity.
+  Qed.  
+
+Theorem mult_comm : forall n m : nat,
+  n * m = m * n.
+Proof.
+  intros n m.
+  induction n as [| n' IHn'].
+  - simpl. 
+    rewrite -> mult_n_0.
+    reflexivity.
+  - simpl. 
+    rewrite -> mult_n_Sm.
+    rewrite -> IHn'.
+    reflexivity.
+  Qed.
+
+Theorem plus_leb_compat_l : forall n m p: nat,
+  n <=? m = true ->
+    (p + n) <=? (p + m) = true.
+Proof.
+  intros n m p H1.
+  induction p as [| p' IHp'].
+  - simpl.
+    rewrite -> H1.
+    reflexivity.
+  - simpl. 
+    rewrite -> IHp'.
+    reflexivity.
+  Qed.
+
+Theorem mult_1_l : forall n : nat,
+  1 * n = n.
+Proof.
+  intros n.
+  simpl. 
+  rewrite -> add_0_r.
+  reflexivity.
+  Qed.
+
+Check mult_n_0.

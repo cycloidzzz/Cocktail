@@ -50,8 +50,8 @@ Theorem add_comm: forall n m : nat,
 Proof.
     intros n m.
     induction n as [| n' IHn'].
+    rewrite -> add_0_r.
     - simpl.
-      rewrite -> add_0_r.
       reflexivity.
     - simpl.
       rewrite -> IHn'.
@@ -199,4 +199,81 @@ Proof.
   reflexivity.
   Qed.
 
-Check mult_n_0.
+Theorem mult_plus_distr_r : forall n m p : nat,
+  (n + m) * p = n * p + m * p.
+Proof.
+  intros n m p.
+  induction n as [| n' IHn'].
+  - reflexivity.
+  - simpl.
+    rewrite -> IHn'.
+    rewrite -> add_assoc.
+    reflexivity.
+  Qed.
+
+Theorem mult_assoc : forall n m p : nat,
+  n * (m * p) = (n * m) * p.
+Proof.
+  intros n m p.
+  induction n as [| n' IHn'].
+  - reflexivity.
+  - simpl.
+    rewrite -> mult_plus_distr_r.
+    rewrite -> IHn'.
+    reflexivity.
+  Qed.
+
+(*Exercise: 2 stars, standard, optional (add_shuffle3')*)
+Theorem add_shuffle3' : forall n m p : nat,
+  n + (m + p) = m + (n + p).
+Proof.
+  intros n m p.
+  rewrite <- add_assoc.
+  rewrite <- add_assoc.
+  replace (n + m) with (m + n).
+  - reflexivity.
+  - rewrite -> add_comm.
+    reflexivity.
+  Qed.
+
+(*Exercise: 3 stars, standard, especially useful (binary_commute)*)
+Theorem bin_to_nat_pres_incr : forall b : bin,
+  bin_to_nat (increase b) = 1 + bin_to_nat b.
+Proof.
+  intros b.
+  induction b as [|b' IHb' | b'' IHb''].
+  - (* Case b = Z *)
+    reflexivity.
+  - (* Case b = (B0 b') *)
+    reflexivity.
+  - (* Case b = (B1 b'') *) 
+    simpl.
+    repeat rewrite -> add_0_r.
+    simpl.
+    rewrite -> IHb''.
+    rewrite -> add_shuffle3.
+    repeat rewrite <- add_assoc.
+    reflexivity.
+  Qed.
+
+(* Exercise: 3 stars, standard (nat_bin_nat) *)
+Fixpoint nat_to_bin (n : nat) : bin :=
+  match n with
+  | O => Z
+  | S n' => increase (nat_to_bin n')
+  end.
+
+Theorem nat_bin_nat : forall n : nat,
+  bin_to_nat (nat_to_bin n) = n.
+Proof.
+  intros n.
+  induction n as [|n' IHn'].
+  - (* Case n = O *)
+    reflexivity.
+  - (* Case n = S n' *)
+    simpl.
+    rewrite -> bin_to_nat_pres_incr.
+    rewrite -> IHn'.
+    reflexivity.
+  Qed.
+

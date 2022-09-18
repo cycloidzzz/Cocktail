@@ -254,18 +254,6 @@ Fixpoint leb (n m : nat) : bool :=
     | S n', S m' => leb n' m'
     end.
 
-Example test_less1:
-    leb 4 4 = false.
-Proof. reflexivity. Qed.
-
-Example test_less2:
-    leb 114 514 = true.
-Proof. simpl. reflexivity. Qed.
-
-Example test_less3:
-    leb 114 113 = false.
-Proof. simpl. reflexivity. Qed.
-
 Theorem plus_O_n : forall n : nat, 0 + n = n.
 Proof. intros n.
     simpl. reflexivity. Qed.
@@ -331,9 +319,15 @@ Fixpoint eqb (n m: nat) : bool :=
     | S n', S m' => eqb n' m'
     end.
 
-Check true.
+Fixpoint leb (n m : nat) : bool :=
+    match n, m with
+    | O, _ => true
+    | S _, O => false
+    | S n', S m' => leb n' m'
+    end.
 
 Notation " x ?= y" := (eqb x y) (at level 70) : nat_scope.
+Notation " x <=? y " := (leb x y) (at level 70) : nat_scope.
 
 Theorem plus_1_neq_0 : forall n : nat,
     (n + 1) ?= 0 = false.
@@ -378,8 +372,6 @@ Proof.
       reflexivity.
 Qed.
 
-Module BinaryPlayground.
-
 Inductive bin : Type := 
     | Z
     | B0 (n : bin)
@@ -395,8 +387,8 @@ Fixpoint increase (n: bin) : bin :=
 Fixpoint bin_to_nat (n : bin) : nat :=
     match n with
     | Z => O
-    | B0 n' => mult 2 (bin_to_nat n')
-    | B1 n' => plus 1 (mult 2 (bin_to_nat n'))
+    | B0 n' => 2 * (bin_to_nat n')
+    | B1 n' => 1 + 2 * (bin_to_nat n')
     end.
 
 Example test_bin_to_nat5:
@@ -442,5 +434,3 @@ Proof. reflexivity. Qed.
 Example test_bin_incr6:
     bin_to_nat (increase (increase (B1 Z))) = 2 + bin_to_nat (B1 Z).
 Proof. reflexivity. Qed.
-
-End BinaryPlayground.

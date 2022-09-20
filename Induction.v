@@ -382,21 +382,16 @@ Proof.
   - (* Case b = (B0 b') *)
     simpl.
     rewrite -> add_0_r. 
-    rewrite <- double_eq_a_plus_a.
+    rewrite <- double_eq_n_plus_n.
     rewrite -> nat_to_bin_double.
     rewrite -> IHb'.
     reflexivity.
   - (* Case b = (B1 b'') *)
     simpl.
     rewrite -> add_0_r.
-    rewrite <- double_eq_a_plus_a.
+    rewrite <- double_eq_n_plus_n.
     rewrite -> nat_to_bin_double.
     rewrite -> IHb''.
     rewrite -> increase_double_bin.
     reflexivity.
   Qed.
-    
-
-
-
-

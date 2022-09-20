@@ -277,3 +277,126 @@ Proof.
     reflexivity.
   Qed.
 
+Theorem double_increase : forall n : nat,
+  double (S n) = S (S (double n)).
+Proof.
+  intros n.
+  reflexivity.
+  Qed.
+
+Definition double_bin (b : bin) : bin :=
+  match b with
+  | Z => Z
+  | _ => (B0 b)
+  end.
+
+Example test_double_bin_5:
+  (bin_to_nat (double_bin (B1 (B0 (B1 Z))))) = 10.
+Proof.
+  reflexivity.
+  Qed.
+
+Example double_bin_zero:
+  (double_bin Z) = Z.
+Proof.
+  reflexivity.
+  Qed.
+
+Lemma double_increase_bin : forall b : bin,
+  double_bin (increase b) = increase (increase (double_bin b)).
+Proof.
+  intros b.
+  destruct b eqn:Eqb.
+  - (* Case b = Z *)
+    reflexivity.
+  - (* Case b = (B0 b')*)
+    reflexivity.
+  - (* Case b = (B1 b') *)
+    reflexivity.
+  Qed.
+
+(* Exercise: 4 stars, advanced (bin_nat_bin) *)
+(* Trying to elimiating the redundant leading zeros in a bin expression with 
+   the normalize function. 
+     The root cause that (nat_to_bin (bin_to_nat b)) != b is that there are 
+   infinity valid representation for Z (i.e. Z). For example 
+   (B0 Z), (B0 (B0 Z)), (B0 (B0 (B0 Z))) ...... are all representing 0. *)
+Fixpoint normalize (b : bin) : bin :=
+  match b with
+  | Z => Z
+  | B0 n' => (double_bin (normalize n'))
+  | B1 n' => (B1 (normalize n'))
+  end.
+
+Compute (normalize (B1 (B0 (B0 (B0 Z))))).
+
+Lemma double_eq_n_plus_n : forall n : nat,
+  (double n) = n + n.
+Proof.
+  intros n.
+  induction n as [| n' IHn'].
+  - (* Case n = O *)
+    reflexivity.
+  - (* Case n = S n' *)
+    simpl.
+    rewrite <- plus_n_Sm.
+    rewrite -> IHn'.
+    reflexivity.
+  Qed.
+
+Theorem nat_to_bin_double : forall n : nat,
+  (nat_to_bin (double n)) = (double_bin (nat_to_bin n)).
+Proof.
+  intros n.
+  induction n as [| n' IHn'].
+  - (* Case n = O *)
+    reflexivity.
+  - (* Case n = S n' *)
+    rewrite -> double_increase.
+    simpl.
+    rewrite -> double_increase_bin.
+    rewrite -> IHn'.
+    reflexivity.
+  Qed.
+
+Theorem increase_double_bin : forall b : bin,
+  (increase (double_bin b)) = (B1 b).
+Proof.
+  intros b.
+  destruct b eqn:Eqb.
+  - (* Case b = Z *)
+    reflexivity.
+  - (* Case b = (B0 b') *)
+    reflexivity.
+  - (* Case b = (B1 b'') *)
+    reflexivity.
+  Qed.
+
+Theorem bin_nat_bin : forall b : bin,
+  (nat_to_bin (bin_to_nat b)) = (normalize b).
+Proof.
+  intros b.
+  induction b as [| b' IHb'| b'' IHb''].
+  - (* Case b = Z *)
+    reflexivity.
+  - (* Case b = (B0 b') *)
+    simpl.
+    rewrite -> add_0_r. 
+    rewrite <- double_eq_a_plus_a.
+    rewrite -> nat_to_bin_double.
+    rewrite -> IHb'.
+    reflexivity.
+  - (* Case b = (B1 b'') *)
+    simpl.
+    rewrite -> add_0_r.
+    rewrite <- double_eq_a_plus_a.
+    rewrite -> nat_to_bin_double.
+    rewrite -> IHb''.
+    rewrite -> increase_double_bin.
+    reflexivity.
+  Qed.
+    
+
+
+
+
